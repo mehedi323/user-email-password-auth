@@ -1,36 +1,43 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import auth from "../../Firebase/firebase.config";
 import { useState } from "react";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
 
 const HeroRegister = () => {
     const [registerError, setRegisterError] = useState('');
-    const [registerSuccsess, setRegisterSuccsess]= useState('')
-    
+    const [registerSuccsess, setRegisterSuccsess] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
-    const handleHeroRegister = e =>{
+
+    const handleHeroRegister = e => {
         e.preventDefault()
         const email = e.target.email.value;
         const password = e.target.password.value;
-        console.log(email, password);
+        const accepted = e.target.terms.checked;
+        console.log(email, password, accepted);
 
         setRegisterError('');
         setRegisterSuccsess('')
 
-        if(password.length < 6){
+        if(password.length < 6) {
             setRegisterError('Password should be at laest 6 charectars or longer')
+            return;
+        }
+        else if(!accepted){
+            setRegisterError('Accepted Your Trams and conditions')
             return;
         }
 
         createUserWithEmailAndPassword(auth, email, password)
-        .then(result=>{
-            const user = result.user;
-            console.log(user);
-            setRegisterSuccsess('User Register Successfully')
-        })
-        .catch(error=>{
-            console.error(error)
-            setRegisterError(error.message)
-        })
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                setRegisterSuccsess('User Register Successfully')
+            })
+            .catch(error => {
+                console.error(error)
+                setRegisterError(error.message)
+            })
     }
 
     return (
@@ -53,7 +60,19 @@ const HeroRegister = () => {
                                 <label className="label">
                                     <span className="label-text">Password</span>
                                 </label>
-                                <input type="password" name="password" placeholder="Your Password" className="input input-bordered" required />
+                                <input
+                                    type={showPassword ? 'text' : "password"}
+                                    name="password"
+                                    placeholder="Your Password"
+                                    className="input relative input-bordered"
+                                    required />
+                                <span className="absolute top-[180px] right-10" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <FaEye></FaEye> : <FaEyeSlash></FaEyeSlash>}
+                                </span>
+                                <div>
+                                    <input type="checkbox" name="terms" id="terms" />
+                                    <label htmlFor="terms"> Trams and Conditions</label>
+                                </div>
                                 <label className="label">
                                     <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                                 </label>
